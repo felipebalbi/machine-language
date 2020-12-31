@@ -15,7 +15,7 @@ again:
 trynum:	
 	cmp #$30
 	bcc again
-	cmp #$39
+	cmp #$3a
 	bcs tryalpha
 	jmp printchar
 
