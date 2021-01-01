@@ -10,7 +10,8 @@
 	jsr CHROUT		; Write it out on the screen
 
 	;; jsr add			; Add two numbers
-	jsr subtract		; Subtract two numbers
+	;; jsr subtract		; Subtract two numbers
+	jsr getAndPrintNumber	; Get one number and print it
 
 	jsr CHROUT		; Print it to the screen
 	lda #$0d		; Load A with newline character
@@ -18,9 +19,30 @@
 	rts			; Return from subroutine
 	.endproc
 
-	;; Add two numbers together printing result to the screen
-	;; A should contain one number
-	;; $03c0 should contain another number
+	;; Get one number:
+	;; If <5  -> double and print
+	;; If >=5 -> divide by 2 and print
+	.proc getAndPrintNumber
+	jsr getnumber		; Get a number
+	cmp #$05		; Compare against 5
+	bcc double		; Double the number
+	jmp half		; Halve the number
+double:
+	rol a			; Double the number in A
+	jmp print		; Print result
+
+half:
+	clc			; Clear carry
+	ror a			; Halve the number in A
+
+print:	
+	ora #$30		; Convert to PETSCII
+	rts
+	.endproc
+	
+;; 	;; Add two numbers together printing result to the screen
+;; 	;; A should contain one number
+;; 	;; $03c0 should contain another number
 ;; 	.proc add
 ;; 	jsr getnumber		; Get a number from the user
 ;; 	sta $03c0		; Stash number from user away
@@ -41,26 +63,26 @@
 ;; 	rts
 ;; 	.endproc
 
-	;; Subtract two numbers and print result to the screen
-	;; A contains one number
-	;; $03c0 contains another number
-	;; It's assumed that A > $03c0
-	.proc subtract
-	jsr getnumber		; Get a number from the user
-	sta $03c0		; Stash number from user away
-	lda #$2d		; Load A with the - sign
-	jsr CHROUT		; Print it to the screen
-	jsr getnumber		; Get the next number
-	tax			; Transfer number in A to X
-	lda #$3d		; Load A with the = sign
-	jsr CHROUT		; Print it to the screen
-	lda $03c0		; Load A with first number
-	stx $03c0		; Store X to $03c0
-	sec			; Set Carry
-	sbc $03c0		; Subtract from first number
-	ora #$30		; Convert number to PETSCII
-	rts
-	.endproc
+;; 	;; Subtract two numbers and print result to the screen
+;; 	;; A contains one number
+;; 	;; $03c0 contains another number
+;; 	;; It's assumed that A > $03c0
+;; 	.proc subtract
+;; 	jsr getnumber		; Get a number from the user
+;; 	sta $03c0		; Stash number from user away
+;; 	lda #$2d		; Load A with the - sign
+;; 	jsr CHROUT		; Print it to the screen
+;; 	jsr getnumber		; Get the next number
+;; 	tax			; Transfer number in A to X
+;; 	lda #$3d		; Load A with the = sign
+;; 	jsr CHROUT		; Print it to the screen
+;; 	lda $03c0		; Load A with first number
+;; 	stx $03c0		; Store X to $03c0
+;; 	sec			; Set Carry
+;; 	sbc $03c0		; Subtract from first number
+;; 	ora #$30		; Convert number to PETSCII
+;; 	rts
+;; 	.endproc
 
 	;; Print a leading 1 to the screen
 	;; If result of addition is >9, we must print a leading 1
@@ -87,7 +109,7 @@ again:
 	bcc again		; If less than that, try again
 	cmp #$3a		; Compare aginst PETSCII 9
 	bcs again		; If greater than that, try again
-	jsr CHROUT		; Otherwise print the character
+	;; jsr CHROUT		; Otherwise print the character
 	and #$0f		; Convert to integer by clearing top nibble
 exit:
 	rts			; Return from subroutine
