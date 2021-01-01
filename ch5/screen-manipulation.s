@@ -11,19 +11,19 @@
 				; is $bc$bb, $0400 on C64
 	ldx #$00		; Initialize X to 0
 nextLine:
-	ldy #$06		; Initialize Y to 6
+	ldy #$00		; Initialize Y to 0
 nextChar:
 	lda ($bb),y		; Initialize A current characer in
 				; screen
-	cmp #$20		; Compare against space character
-	beq skip		; Skip spaces
+	and #$7f		; Clear bit 7
+	cmp #$13		; Compare against S character
+	bne skip		; Skip anything that's not S
 	eor #$80		; Reverse the character
 skip:
 	sta ($bb),y		; Put modified character back into the
 				; screen
 	iny			; Increment Y index
-	cpy #$22		; Compare against 34 (last column we
-				; want to modify)
+	cpy #$28		; Compare against 40
 	bcc nextChar		; If less than 34, go to next
 				; character
 	;; If we reach this point, it's time to start the next line
@@ -39,8 +39,7 @@ skip:
 				; trick!
 	sta $bc			; Store modified page number
 	inx			; Increment X index
-	cpx #$0e		; Compare against 14 (we only want to
-				; modify up to 14 lines)
+	cpx #$19		; Compare against 25
 	bne nextLine		; If we haven't modified 14 lines, go
 				; to the next one
 	rts
