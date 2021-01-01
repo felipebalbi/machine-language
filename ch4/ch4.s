@@ -11,7 +11,8 @@
 
 	;; jsr add			; Add two numbers
 	;; jsr subtract		; Subtract two numbers
-	jsr getAndPrintNumber	; Get one number and print it
+	;; jsr getAndPrintNumber	; Get one number and print it
+	jsr evenOrOdd		; Get a number, print EVEN or ODD
 
 	jsr CHROUT		; Print it to the screen
 	lda #$0d		; Load A with newline character
@@ -19,26 +20,67 @@
 	rts			; Return from subroutine
 	.endproc
 
-	;; Get one number:
-	;; If <5  -> double and print
-	;; If >=5 -> divide by 2 and print
-	.proc getAndPrintNumber
-	jsr getnumber		; Get a number
-	cmp #$05		; Compare against 5
-	bcc double		; Double the number
-	jmp half		; Halve the number
-double:
-	rol a			; Double the number in A
-	jmp print		; Print result
+	.proc evenOrOdd
+	jsr getnumber		; Get a number from the user
+	tax			; Stash it in X
+	lda #$20		; Load A with space character
+	jsr CHROUT		; Print it to the screen
+	txa			; Load X back into A
+	ldx #$00
+	lsr			; Load bit 0 into carry
+	bcc printEven		; Print Even
+	bcs printOdd		; Print Odd
 
-half:
-	clc			; Clear carry
-	ror a			; Halve the number in A
+printEven:
+	lda even,x
+	beq exit
+	inx
+	jsr CHROUT
+	jmp printEven
 
-print:	
-	ora #$30		; Convert to PETSCII
+printOdd:
+	lda odd,x
+	beq exit
+	inx
+	jsr CHROUT
+	jmp printOdd
+exit:
 	rts
 	.endproc
+
+even:
+	.byte $45		; E
+	.byte $56		; V
+	.byte $45		; E
+	.byte $4e		; N
+	.byte $00		; NULL terminator
+
+odd:
+	.byte $4f		; O
+	.byte $44		; D
+	.byte $44		; D
+	.byte $00		; NULL terminator
+
+;; 	;; Get one number:
+;; 	;; If <5  -> double and print
+;; 	;; If >=5 -> divide by 2 and print
+;; 	.proc getAndPrintNumber
+;; 	jsr getnumber		; Get a number
+;; 	cmp #$05		; Compare against 5
+;; 	bcc double		; Double the number
+;; 	jmp half		; Halve the number
+;; double:
+;; 	rol a			; Double the number in A
+;; 	jmp print		; Print result
+
+;; half:
+;; 	clc			; Clear carry
+;; 	ror a			; Halve the number in A
+
+;; print:
+;; 	ora #$30		; Convert to PETSCII
+;; 	rts
+;; 	.endproc
 	
 ;; 	;; Add two numbers together printing result to the screen
 ;; 	;; A should contain one number
@@ -109,7 +151,7 @@ again:
 	bcc again		; If less than that, try again
 	cmp #$3a		; Compare aginst PETSCII 9
 	bcs again		; If greater than that, try again
-	;; jsr CHROUT		; Otherwise print the character
+	jsr CHROUT		; Otherwise print the character
 	and #$0f		; Convert to integer by clearing top nibble
 exit:
 	rts			; Return from subroutine
