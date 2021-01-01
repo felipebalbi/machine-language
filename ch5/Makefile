@@ -1,5 +1,5 @@
 TARGET	:= c64
-SRCNAME := screen-manipulation
+SRCNAME := clear-screen
 PRGNAME	:= $(SRCNAME).prg
 AS	:= ca65
 LD	:= ld65
