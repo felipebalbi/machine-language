@@ -11,7 +11,7 @@
 				; is $bc$bb, $0400 on C64
 	ldx #$00		; Initialize X to 0
 nextLine:
-	ldy #$04		; Initialize Y to 4
+	ldy #$06		; Initialize Y to 6
 nextChar:
 	lda ($bb),y		; Initialize A current characer in
 				; screen
@@ -22,9 +22,9 @@ skip:
 	sta ($bb),y		; Put modified character back into the
 				; screen
 	iny			; Increment Y index
-	cpy #$12		; Compare against 18 (last column we
+	cpy #$22		; Compare against 34 (last column we
 				; want to modify)
-	bcc nextChar		; If less than 18, go to next
+	bcc nextChar		; If less than 34, go to next
 				; character
 	;; If we reach this point, it's time to start the next line
 	clc			; Clear carry to prepare for addition
