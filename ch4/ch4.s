@@ -9,7 +9,8 @@
 	lda #$93		; Clear Screen character
 	jsr CHROUT		; Write it out on the screen
 
-	jsr add			; Add two numbers
+	;; jsr add			; Add two numbers
+	jsr subtract		; Subtract two numbers
 
 	jsr CHROUT		; Print it to the screen
 	lda #$0d		; Load A with newline character
@@ -20,22 +21,43 @@
 	;; Add two numbers together printing result to the screen
 	;; A should contain one number
 	;; $03c0 should contain another number
-	.proc add
+;; 	.proc add
+;; 	jsr getnumber		; Get a number from the user
+;; 	sta $03c0		; Stash number from user away
+;; 	lda #$2b		; Load A with the + sign
+;; 	jsr CHROUT		; Print it to the screen
+;; 	jsr getnumber		; Get the next number
+;; 	tax			; Transfer number in A to X
+;; 	lda #$3d		; Load A with the = sign
+;; 	jsr CHROUT		; Print it to the screen
+;; 	txa			; Transfer X back to A
+;; 	clc			; Clear any possible Carry
+;; 	adc $03c0		; Add with first number
+;; 	cmp #$0a		; Compare against 9
+;; 	bcc done		;
+;; 	jsr printone		; Print leading 1
+;; done:	
+;; 	ora #$30		; Convert number to PETSCII
+;; 	rts
+;; 	.endproc
+
+	;; Subtract two numbers and print result to the screen
+	;; A contains one number
+	;; $03c0 contains another number
+	;; It's assumed that A > $03c0
+	.proc subtract
 	jsr getnumber		; Get a number from the user
 	sta $03c0		; Stash number from user away
-	lda #$2b		; Load A with the + sign
+	lda #$2d		; Load A with the - sign
 	jsr CHROUT		; Print it to the screen
 	jsr getnumber		; Get the next number
 	tax			; Transfer number in A to X
 	lda #$3d		; Load A with the = sign
 	jsr CHROUT		; Print it to the screen
-	txa			; Transfer X back to A
-	clc			; Clear any possible Carry
-	adc $03c0		; Add with first number
-	cmp #$0a		; Compare against 9
-	bcc done		;
-	jsr printone		; Print leading 1
-done:	
+	lda $03c0		; Load A with first number
+	stx $03c0		; Store X to $03c0
+	sec			; Set Carry
+	sbc $03c0		; Subtract from first number
 	ora #$30		; Convert number to PETSCII
 	rts
 	.endproc
